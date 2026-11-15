@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Securinix — Next-Gen SIEM & Autonomous Incident Response</title>
+    <meta name="description" content="Enterprise Next-Gen SIEM, UEBA, and Autonomous Incident Response Platform inspired by Securonix SNYPR. Real-time network threat detection and SOAR automation.">
+    <link rel="stylesheet" href="/static/css/securinix.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22 width=%2232%22 height=%2232%22><text y=%2224%22 font-size=%2224%22>🛡️</text></svg>">
+</head>
+<body>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="soc-header">
+        <div class="brand-wrapper">
+            <div class="brand-logo-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V8.3l7-3.89v8.58z"/>
+                </svg>
+            </div>
+            <div class="brand-titles">
+                <h1>SECURINIX <span class="tag">NEXT-GEN SIEM & SOAR</span></h1>
+                <p>Autonomous Incident Response &amp; UEBA Platform • Inspired by Securonix SNYPR</p>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs" role="tablist">
+            <button class="nav-tab-btn active" data-target="dashboardView">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                SOC Dashboard
+            </button>
+            <button class="nav-tab-btn" data-target="snifferView">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Network Telemetry
+            </button>
+            <button class="nav-tab-btn" data-target="rulesView">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Detection Rules
+            </button>
+            <button class="nav-tab-btn" data-target="soarView">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Incident Response (SOAR)
+            </button>
+            <button class="nav-tab-btn" data-target="uebaView">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                UEBA Analytics
+            </button>
+        </nav>
+
+        <!-- Right Header Controls -->
+        <div class="header-actions">
+            <div class="telemetry-status-pill" id="telemetryBadge">
+                <span class="pulse-dot"></span> TELEMETRY ENGINE: LIVE
+            </div>
+            <button class="btn-cyber-outline" id="toggleAudioBtn" style="font-size: 11px;">
+                🔊 Sound: ON
+            </button>
+        </div>
+    </header>
+
+    <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+    <main class="soc-container">
+
+        <!-- METRICS TOP BAR -->
+        <section class="metrics-grid">
+            <div class="glass-panel metric-card cyan">
+                <div class="metric-header">
+                    <span class="metric-title">Active EPS</span>
+                    <span class="metric-icon">⚡</span>
+                </div>
+                <div class="metric-value">
+                    <span id="metricEps">0.0</span>
+                    <span class="metric-unit">events/sec</span>
+                </div>
+                <div class="metric-footer">
+                    <span class="metric-badge badge-cyan">Real-time Stream</span>
+                </div>
+            </div>
+
+            <div class="glass-panel metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Ingested Events</span>
+                    <span class="metric-icon">📊</span>
+                </div>
+                <div class="metric-value">
+                    <span id="metricTotalEvents">0</span>
+                    <span class="metric-unit">packets</span>
+                </div>
+                <div class="metric-footer">
+                    <span>Network &amp; Syslog sensors</span>
+                </div>
+            </div>
+
+            <div class="glass-panel metric-card crit">
+                <div class="metric-header">
+                    <span class="metric-title">Open Incidents</span>
+                    <span class="metric-icon">🚨</span>
+                </div>
+                <div class="metric-value">
+                    <span id="metricOpenIncidents" style="color: var(--crimson-crit);">0</span>
+                    <span class="metric-unit">active triage</span>
+                </div>
+                <div class="metric-footer">
+                    <span class="metric-badge badge-crit" id="critBadgeCount"><span id="metricCritIncidents">0</span> Critical</span>
+                </div>
+            </div>
+
+            <div class="glass-panel metric-card amber">
+                <div class="metric-header">
+                    <span class="metric-title">Mean Time to Detect</span>
+                    <span class="metric-icon">⏱️</span>
+                </div>
+                <div class="metric-value">
+                    <span>1.12</span>
+                    <span class="metric-unit">seconds</span>
+                </div>
+                <div class="metric-footer">
+                    <span>Sliding window correlation</span>
+                </div>
+            </div>
+
+            <div class="glass-panel metric-card safe">
+                <div class="metric-header">
+                    <span class="metric-title">Configured Policies</span>
+                    <span class="metric-icon">🛡️</span>
+                </div>
+                <div class="metric-value">
+                    <span id="metricActiveRules">9 / 9</span>
+                    <span class="metric-unit">active rules</span>
+                </div>
+                <div class="metric-footer">
+                    <span class="metric-badge badge-safe">Enforcing</span>
+                </div>
+            </div>
+
+            <div class="glass-panel metric-card purple">
+                <div class="metric-header">
+                    <span class="metric-title">Threat Index</span>
+                    <span class="metric-icon">🌐</span>
+                </div>
+                <div class="metric-value">
+                    <span id="metricThreatIndex">15</span>
+                    <span class="metric-unit">/ 100</span>
+                </div>
+                <div class="metric-footer">
+                    <span>Dynamic cyber risk level</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 1: SOC DASHBOARD ==================== -->
+        <section id="dashboardView" class="tab-content active">
+            <div class="dashboard-grid">
+                <!-- Topology & Flow Radar -->
+                <div class="glass-panel" style="overflow: hidden;">
+                    <div class="panel-title-bar">
+                        <div class="panel-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                            Live Network Threat Topology &amp; Attack Radar
+                        </div>
+                        <div class="panel-controls">
+                            <span class="meta-chip" style="color: var(--cyan-neon);">Real-time Telemetry Graph</span>
+                        </div>
+                    </div>
+
+                    <div class="topology-container">
+                        <canvas id="networkTopologyCanvas"></canvas>
+                        <div class="topology-legend">
+                            <div class="legend-item"><span class="legend-dot" style="background: #ffaa00;"></span> External Adversary</div>
+                            <div class="legend-item"><span class="legend-dot" style="background: #0066ff;"></span> Border WAF</div>
+                            <div class="legend-item"><span class="legend-dot" style="background: #00f0ff;"></span> DMZ Server</div>
+                            <div class="legend-item"><span class="legend-dot" style="background: #00ff88;"></span> Internal LAN</div>
+                            <div class="legend-item"><span class="legend-dot" style="background: #ff0055;"></span> Compromised / Under Attack</div>
+                        </div>
+                    </div>
+
+                    <!-- Attack Simulator Strip -->
+                    <div class="simulator-strip">
+                        <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">
+                            🧪 Attack Simulator Center:
+                        </span>
+                        <div class="sim-btns-group">
+                            <button class="btn-sim" onclick="window.SecurinixApp.triggerSimulation('port_scan')">
+                                🔍 Port Scan
+                            </button>
+                            <button class="btn-sim crit" onclick="window.SecurinixApp.triggerSimulation('brute_force')">
+                                🔑 SSH Brute Force
+                            </button>
+                            <button class="btn-sim crit" onclick="window.SecurinixApp.triggerSimulation('dns_tunnel')">
+                                🛰️ DNS C2 Exfiltration
+                            </button>
+                            <button class="btn-sim crit" onclick="window.SecurinixApp.triggerSimulation('ddos_syn_flood')">
+                                🌊 DDoS SYN Flood
+                            </button>
+                            <button class="btn-sim" onclick="window.SecurinixApp.triggerSimulation('sqli_probe')">
+                                💉 SQLi Ingress Probe
+                            </button>
+                            <button class="btn-sim" onclick="window.SecurinixApp.triggerSimulation('smb_lateral')">
+                                🔄 Lateral SMB Sweep
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Threat Barometer & Risk Score -->
+                <div class="glass-panel">
+                    <div class="panel-title-bar">
+                        <div class="panel-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            Global Cyber Risk Barometer
+                        </div>
+                    </div>
+                    <div class="gauge-card-body">
+                        <div class="threat-gauge-wrapper">
+                            <div class="gauge-score-value" id="threatGaugeValue">15</div>
+                            <div class="gauge-score-label" id="threatGaugeLabel">NORMAL STATE</div>
+                        </div>
+                        <div style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 16px; line-height: 1.4;">
+                            Composite threat index calculated via Securinix UEBA behavioral baselines and active MITRE ATT&amp;CK correlated alerts.
+                        </div>
+
+                        <!-- Mini CIRT Playbook Shortcut -->
+                        <div style="width: 100%; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 11px; font-weight: 700; color: #cbd5e1;">Securonix SOAR Status</span>
+                                <span class="badge-safe" style="font-size: 10px;">AUTOPILOT READY</span>
+                            </div>
+                            <div style="font-size: 11px; color: #64748b;">
+                                Micro-segmentation isolation and perimeter null-routing enabled for Critical severity policies.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MITRE ATT&CK Matrix Grid -->
+            <div class="glass-panel" style="margin-bottom: 24px;">
+                <div class="panel-title-bar">
+                    <div class="panel-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                        MITRE ATT&amp;CK Matrix Real-Time Coverage Heatmap
+                    </div>
+                    <span class="meta-chip">Enterprise v14</span>
+                </div>
+                <div style="padding: 16px;">
+                    <div id="mitreMatrixContainer" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px;">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 2: LIVE NETWORK TELEMETRY ==================== -->
+        <section id="snifferView" class="tab-content">
+            <div class="glass-panel">
+                <div class="panel-title-bar">
+                    <div class="panel-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        Live Network Event Stream &amp; Packet Telemetry
+                    </div>
+                    <div class="panel-controls">
+                        <input type="text" id="eventSearchInput" placeholder="Filter by IP, Protocol, Service, Payload..." style="background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; border-radius: 6px; padding: 6px 12px; font-size: 12px; width: 280px;">
+                        <button class="btn-cyber-outline" id="pauseStreamBtn" style="font-size: 12px;">
+                            ⏸️ Pause Stream
+                        </button>
+                    </div>
+                </div>
+
+                <div class="events-stream-table-wrapper">
+                    <table class="cyber-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Time</th>
+                                <th style="width: 80px;">Protocol</th>
+                                <th style="width: 180px;">Source (Src:Port)</th>
+                                <th style="width: 180px;">Destination (Dst:Port)</th>
+                                <th style="width: 100px;">Service</th>
+                                <th style="width: 80px;">Size</th>
+                                <th>Payload &amp; Detection Signature</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsStreamBody">
+                            <!-- Injected dynamically via WebSocket -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 3: DETECTION RULES MANAGER ==================== -->
+        <section id="rulesView" class="tab-content">
+            <div class="glass-panel" style="padding: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px;">
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: #fff;">Detection Policies &amp; Correlation Engine</h2>
+                        <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
+                            Configure sliding window thresholds, protocols, and autonomous containment actions for enterprise network events.
+                        </p>
+                    </div>
+                    <button class="btn-cyber" id="openCreateRuleModalBtn">
+                        ➕ Create Detection Policy
+                    </button>
+                </div>
+
+                <!-- Rules Grid -->
+                <div class="rules-grid" id="rulesGridContainer">
+                    <!-- Injected dynamically via rules_ui.js -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 4: SOAR INCIDENT RESPONSE ==================== -->
+        <section id="soarView" class="tab-content">
+            <div class="soar-container">
+                <!-- Incidents List -->
+                <div class="glass-panel" style="padding: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                        <div style="font-size: 14px; font-weight: 700; color: #fff;">Security Incidents Queue</div>
+                        <span class="meta-chip">Triage Board</span>
+                    </div>
+                    <div class="incident-list-wrapper" id="soarIncidentList">
+                        <!-- Injected via soar_ui.js -->
+                    </div>
+                </div>
+
+                <!-- Incident Investigation Detail -->
+                <div class="glass-panel incident-detail-panel" id="soarDetailContainer">
+                    <div style="padding: 60px; text-align: center; color: #64748b;">
+                        <div style="font-size: 40px; margin-bottom: 12px;">🛡️</div>
+                        <div style="font-size: 16px; font-weight: 600; color: #94a3b8;">Select an Incident to Investigate</div>
+                        <div style="font-size: 12px; margin-top: 4px;">Review root cause analysis, evidence packets, and enforce SOAR playbooks.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 5: UEBA ANALYTICS ==================== -->
+        <section id="uebaView" class="tab-content">
+            <div class="glass-panel" style="padding: 20px;">
+                <div style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px; margin-bottom: 20px;">
+                    <h2 style="font-size: 18px; font-weight: 800; color: #fff;">User &amp; Entity Behavior Analytics (UEBA)</h2>
+                    <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
+                        Securonix-inspired entity baseline modeling, dynamic risk score tracking, and peer group behavioral deviations.
+                    </p>
+                </div>
+
+                <div id="uebaLeaderboard">
+                    <!-- Injected via app.js -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Create Rule Modal -->
+    <div class="modal-overlay" id="createRuleModal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3 style="font-size: 16px; font-weight: 700; color: #fff;">New Network Detection Policy</h3>
+                <button class="btn-cyber-outline" id="closeCreateRuleModalBtn" style="padding: 4px 8px;">✕</button>
+            </div>
+            <form id="createRuleForm">
+                <div class="modal-body">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">RULE IDENTIFIER</label>
+                        <input type="text" id="newRuleId" placeholder="e.g. RULE-CUSTOM-EXFIL" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px;">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">RULE NAME</label>
+                        <input type="text" id="newRuleName" required placeholder="e.g. Cobalt Strike Lateral SMB Pipe" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">DESCRIPTION</label>
+                        <textarea id="newRuleDesc" rows="2" placeholder="Policy behavior explanation..." style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;"></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">SEVERITY</label>
+                            <select id="newRuleSev" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                                <option value="CRITICAL">CRITICAL</option>
+                                <option value="HIGH" selected>HIGH</option>
+                                <option value="MEDIUM">MEDIUM</option>
+                                <option value="LOW">LOW</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">CATEGORY</label>
+                            <select id="newRuleCat" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                                <option value="Credential Access">Credential Access</option>
+                                <option value="Lateral Movement">Lateral Movement</option>
+                                <option value="Exfiltration">Exfiltration</option>
+                                <option value="Command and Control">Command and Control</option>
+                                <option value="Denial of Service">Denial of Service</option>
+                                <option value="Reconnaissance">Reconnaissance</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">MITRE TACTIC</label>
+                            <input type="text" id="newRuleTactic" value="TA0008 - Lateral Movement" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">MITRE TECHNIQUE</label>
+                            <input type="text" id="newRuleTech" value="T1021.002 - SMB/Windows Admin Shares" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">PROTOCOL</label>
+                            <select id="newRuleProto" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                                <option value="ANY">ANY</option>
+                                <option value="TCP" selected>TCP</option>
+                                <option value="UDP">UDP</option>
+                                <option value="ICMP">ICMP</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">DESTINATION PORT (OPTIONAL)</label>
+                            <input type="number" id="newRulePort" placeholder="e.g. 445" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">THRESHOLD COUNT</label>
+                            <input type="number" id="newRuleThreshold" value="5" min="1" max="500" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">WINDOW (SEC)</label>
+                            <input type="number" id="newRuleWindow" value="15" min="1" max="300" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">SOAR ACTION</label>
+                            <select id="newRuleAction" style="width: 100%; background: #090e1a; border: 1px solid var(--border-subtle); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px;">
+                                <option value="create_incident">Create Incident</option>
+                                <option value="auto_isolate">Auto Isolate Host</option>
+                                <option value="auto_block">Auto Block IP</option>
+                                <option value="alert_only">Alert Only</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-cyber">Deploy Policy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Packet Inspector Modal -->
+    <div class="modal-overlay" id="packetInspectorModal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3 style="font-size: 16px; font-weight: 700; color: #fff;">Raw Packet &amp; Telemetry Inspector</h3>
+                <button class="btn-cyber-outline" id="closePacketInspectorBtn" style="padding: 4px 8px;">✕</button>
+            </div>
+            <div class="modal-body" id="packetInspectorBody">
+                <!-- Injected via app.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/topology.js"></script>
+    <script src="/static/js/rules_ui.js"></script>
+    <script src="/static/js/soar_ui.js"></script>
+    <script src="/static/js/app.js"></script>
+
+</body>
+</html>
